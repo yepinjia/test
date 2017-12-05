@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+	<substitutionProperty name="log.base.dir" value="E:/logs" />
+	<substitutionProperty name="log.prefix" value="warehouse" />
+	<substitutionProperty name="port" value="8082" />
+	
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder charset="UTF-8"> 
+          <pattern>>%d{yyyyMMdd HH:mm:ss} [%thread] %-5level %logger{0} - %msg%n</pattern> 
+      </encoder> 
+    </appender> 
+    
+    <!-- 当天的日志文件名没有日期格式，过了当日后，文件名才被改成加上日期 的形式-->
+    <appender name="info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${log.base.dir}/${log.prefix}_info_${port}.log</File>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base.dir}/${log.prefix}_${port}.%d{yyyy-MM-dd}.log</FileNamePattern>
+        </rollingPolicy>
+    </appender>
+    
+    <!-- Error Level -->
+	<appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${log.base.dir}/${log.prefix}_error_${port}.log</File>
+		 <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"> 
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符--> 
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{0} - %msg%n</pattern>   
+        </encoder> 
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${log.base.dir}/${log.prefix}_error_${port}.%d{yyyy-MM-dd}.log</FileNamePattern> 
+		</rollingPolicy>
+	</appender>
+    
+    <!-- 可能是注册中心的日志 -->
+   <appender name="monitor" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${log.base.dir}/${log.prefix}_monitor.log</File>
+		 <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"> 
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符--> 
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{0} - %msg%n</pattern>   
+        </encoder> 
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${log.base.dir}/${log.prefix}_monitor.%d{yyyy-MM-dd}.log</FileNamePattern> 
+		</rollingPolicy>
+	</appender>
+	
+    <root level="info"><!-- 只有比info高，或者为info的日志才被输出，debug比较低，这样配就不会输出debug级 -->
+    	<appender-ref ref="console" /> 
+        <appender-ref ref="info" />
+        <appender-ref ref="error" />
+    </root>
+    
+    <!-- 监控日志 -->
+    <logger name ="monitor">
+		<appender-ref ref="monitor" />
+	</logger>
+</configuration>
